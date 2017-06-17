@@ -8,6 +8,7 @@ namespace GTAV_Downgrader
 {
     static class Program
     {
+        //No, Patrick. Mayonnaise is not an instrument.
         /// <summary>
         /// Point d'entrée principal de l'application.
         /// </summary>
