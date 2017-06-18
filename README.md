@@ -22,3 +22,6 @@ Just like the autonomous installation, this option will back up your game files 
 After installing patch 1.27, you will be able to go back to your previous game version using this option. Just select the "Backup_before_downgrade" folder that was previously created in your game directory. You will also need to validate the RGSC uninstallation and reinstallation.
 
 Using this option, you'll be able to choose whether to keep your patched (1.27) game files before restoring or not. If you choose to do so, you'll have to manually install them back, as well as installing RGSC 1.1.7.8 manually.
+
+##### Credits
+powered by SharpZipLib - https://github.com/icsharpcode/SharpZipLib
