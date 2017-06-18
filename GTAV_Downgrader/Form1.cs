@@ -44,7 +44,7 @@ namespace GTAV_Downgrader
                 }
                 if (dialogResult == DialogResult.Yes)
                 {
-                    Process.Start("http://dezache.alwaysdata.net/programs/gtav_downgrader/");
+                    Process.Start("https://dezache.github.io/programs/gtav_downgrader/");
                 }
             }
             
@@ -165,7 +165,7 @@ namespace GTAV_Downgrader
             try
             {
                 WebClient client = new WebClient();
-                Stream stream = client.OpenRead("http://dezache.alwaysdata.net/programs/gtav_downgrader/version.txt");
+                Stream stream = client.OpenRead("https://dezache.github.io/programs/gtav_downgrader/version.txt");
                 StreamReader reader = new StreamReader(stream);
                 string content = reader.ReadToEnd();
                 client.Dispose();
