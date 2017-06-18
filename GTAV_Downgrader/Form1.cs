@@ -20,7 +20,6 @@ namespace GTAV_Downgrader
         public static string updaterpf127hash = "1F2C8C0FD9F83D6AD82D9A0AA2567562";
 
         //Other strings
-        //IS MAYONNAISE AN INSTRUMENT?
         public string selectedGameDir;
         public string rgscDir;
         public string programVersion = "1.0";
