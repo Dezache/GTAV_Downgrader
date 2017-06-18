@@ -23,5 +23,5 @@ After installing patch 1.27, you will be able to go back to your previous game v
 
 Using this option, you'll be able to choose whether to keep your patched (1.27) game files before restoring or not. If you choose to do so, you'll have to manually install them back, as well as installing RGSC 1.1.7.8 manually.
 
-##### Credits
+#### Credits
 powered by SharpZipLib - https://github.com/icsharpcode/SharpZipLib
