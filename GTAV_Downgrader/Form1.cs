@@ -53,7 +53,7 @@ namespace GTAV_Downgrader
             rgscDir = RGSCDirectory();
             if (rgscDir == null)
             {
-                MessageBox.Show("Downgrader couldn't find Rockstar Games Social Club. Exiting program.", "RGSC subprocess not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Downgrader couldn't find Rockstar Games Social Club. Exiting program.", "RGSC not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(0);
             }
             else
