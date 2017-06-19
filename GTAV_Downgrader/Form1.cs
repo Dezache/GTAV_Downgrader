@@ -22,7 +22,7 @@ namespace GTAV_Downgrader
         //Other strings
         public string selectedGameDir;
         public string rgscDir;
-        public string programVersion = "1.0";
+        public string programVersion = "1.1";
 
         public Form1()
         {
