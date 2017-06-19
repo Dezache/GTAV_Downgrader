@@ -35,7 +35,7 @@ namespace GTAV_Downgrader
             this.Refresh();
             //Checking for updates
             string latestVersion = ProgramLatestVersion();
-            if (programVersion != latestVersion)
+            if (programVersion != latestVersion && latestVersion != null)
             {
                 DialogResult dialogResult = MessageBox.Show($"There is an update available (version {latestVersion}). It is highly recommended to update to the latest version.\nWould you like to be redirected to the download page?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                 if (dialogResult == DialogResult.Cancel)
@@ -47,26 +47,39 @@ namespace GTAV_Downgrader
                     Process.Start("https://dezache.github.io/programs/gtav_downgrader/");
                 }
             }
-            
-            //Setting rgscDir value
-            rgscDir = RGSCDirectory();
-            textBoxRgscDir.Text = rgscDir;
 
-            //Deleting eventual leftovers from last run "extraction" folder and downloaded patch
+            //Setting rgscDir value
+            toolStripStatusLabel1.Text = "Looking for RGSC directory...";
+            rgscDir = RGSCDirectory();
+            if (rgscDir == null)
+            {
+                MessageBox.Show("Downgrader couldn't find Rockstar Games Social Club. Exiting program.", "RGSC subprocess not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(0);
+            }
+            else
+            {
+                textBoxRgscDir.Text = rgscDir;
+            }
+
+            //Deleting eventual leftovers from last run - "extraction" folder and downloaded patch
             if (Directory.Exists("extraction")) { Directory.Delete("extraction", true); }
             if (File.Exists("patch.zip")) { File.Delete("patch.zip"); }
 
             //Automatic GTA V directory detection
-            try
+            selectedGameDir = GTADir();
+            if (selectedGameDir == null)
             {
-                selectedGameDir = GTADir();
+                toolStripStatusLabel1.Text = "Ready."; //if the program couldn't find GTA's directory, it just ignores it
+            }
+            else
+            {
                 textBoxGameDir.Text = selectedGameDir;
                 RepopulateList();
             }
-            catch
-            {
-
-            }
+            
+                
+                
+            
         }
 
         public string FileMD5(string filename) //Gets the MD5 hash for a given file, and return it as a string
@@ -101,7 +114,7 @@ namespace GTAV_Downgrader
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            return "ERROR";
+            return "Error";
         }
 
         public string RGSCDirectory() //Gets RGSC directory from Registry
@@ -117,8 +130,6 @@ namespace GTAV_Downgrader
                         {
                             string folder = o.ToString();
                             return folder;
-                            //Version version = new Version(o as String);  //"as" because it's REG_SZ...otherwise ToString() might be safe(r)
-                            //do what you like with version
                         }
                     }
                 }
@@ -127,7 +138,7 @@ namespace GTAV_Downgrader
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            return "ERROR";
+            return null;
         }
 
         public string GTADir() //Gets GTA directory from Registry
@@ -148,7 +159,7 @@ namespace GTAV_Downgrader
                                 return path.Substring(0, path.Length - 5);
                             }
                             else
-                                return "";
+                                return path;
                         }
                     }
                 }
@@ -157,7 +168,7 @@ namespace GTAV_Downgrader
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            return "";
+            return null;
         }
 
         public string ProgramLatestVersion() //Gets program latest version number from the internet
@@ -177,7 +188,7 @@ namespace GTAV_Downgrader
             catch (Exception ex)
             {
                 MessageBox.Show("Could not check for updates.\n" + ex.Message);
-                return "unknown";
+                return null;
             }
         }
         
