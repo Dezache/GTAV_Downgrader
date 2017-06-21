@@ -22,7 +22,8 @@ namespace GTAV_Downgrader
         //Other strings
         public string selectedGameDir;
         public string rgscDir;
-        public string programVersion = "1.1";
+        public string rgsc1178SetupDir;
+        public string programVersion = "1.2";
 
         public Form1()
         {
@@ -76,10 +77,28 @@ namespace GTAV_Downgrader
                 textBoxGameDir.Text = selectedGameDir;
                 RepopulateList();
             }
-            
-                
-                
-            
+        }
+
+        public void GetWindowOnTop() //Gets window on top, in case the window is minimzed when patching is done
+        {
+            //Checks if the method is called from UI thread or not
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(GetWindowOnTop));
+            }
+            else
+            {
+                if (this.WindowState == FormWindowState.Minimized)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                }
+                //Keeps the current topmost status of form
+                bool top = TopMost;
+                //Brings the form to top
+                TopMost = true;
+                //Set form's topmost status back to whatever it was
+                TopMost = top;
+            }
         }
 
         public string FileMD5(string filename) //Gets the MD5 hash for a given file, and return it as a string
@@ -115,6 +134,20 @@ namespace GTAV_Downgrader
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return "Error";
+        }
+
+        public bool RGSC1178SetupExists(string directory) //Checks if RGSC 1.1.7.8 setup file exists in given directory
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+            foreach (var file in directoryInfo.GetFiles("*.exe"))
+            {
+                if (FileMD5(directory + "\\" + file.ToString()) == "74C4E63725760D211A6BC56B1F5B3898")
+                {
+                    rgsc1178SetupDir = directory + "\\" + file.ToString();
+                    return true;
+                }
+            }
+            return false;
         }
 
         public string RGSCDirectory() //Gets RGSC directory from Registry
@@ -397,6 +430,7 @@ namespace GTAV_Downgrader
                 //Download the patch from my personal dropbox folder (it's the same as darkviper's, I just made mine in case he modifies/deletes his, so the program always works)
                 WebClient webClient = new WebClient();
                 webClient.DownloadFile(new Uri("https://www.dropbox.com/sh/gzetthtvk7k38df/AAD6PLhMCTSWpwCKBw8jdL6ma?dl=1"), "patch.zip");
+                webClient.Dispose();
 
                 toolStripStatusLabel1.Text = "Extracting patch...";
                 this.Refresh();
@@ -453,6 +487,7 @@ namespace GTAV_Downgrader
                 //Finish!
                 toolStripStatusLabel1.Text = "Ready.";
                 this.Refresh();
+                GetWindowOnTop();
                 Cursor.Current = Cursors.Default;
 
                 MessageBox.Show("Downgrade complete!\nTo roll back to the backed up version, use the Restore button.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -494,7 +529,7 @@ namespace GTAV_Downgrader
                 }
                 else //none of the files are missing
                 {
-                    DialogResult dialogResult = MessageBox.Show("The downgrader will now restore your backed up game version. You will be prompted to uninstall and install RGSC. Please do not close the downgrader until the completion popup appears.\nDo you want to backup your current - patched - game files?", "Restore", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Information);
+                    DialogResult dialogResult = MessageBox.Show("The downgrader will now restore your backed up game version. You will be prompted to uninstall and install RGSC. Please do not close the downgrader until the completion popup appears.\nDo you want to backup your current - patched - game files? (you will be able to install these backed up files back through the \"Install patch from local files\" option)", "Restore", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Information);
                     if (dialogResult == DialogResult.Cancel)
                     {
                         return;
@@ -512,6 +547,13 @@ namespace GTAV_Downgrader
                             File.Copy($@"{selectedGameDir}\GTAVLauncher.exe", $@"{selectedGameDir}\Backup_before_restore\GTAVLauncher.exe");
                             File.Copy($@"{selectedGameDir}\steam_api64.dll", $@"{selectedGameDir}\Backup_before_restore\steam_api64.dll");
                             File.Copy($@"{selectedGameDir}\update\update.rpf", $@"{selectedGameDir}\Backup_before_restore\update\update.rpf");
+
+                            //Downloading RGSC 1.1.7.8 file from internet so this backup can be reinstalled through "Install patch from local files"
+                            this.Refresh();
+                            toolStripStatusLabel1.Text = "Backing up RGSC 1.1.7.8...";
+                            WebClient webClient = new WebClient();
+                            webClient.DownloadFile(new Uri("https://www.dropbox.com/s/9oq2qw2d3zsd86x/Social-Club-v1.1.7.8-Setup.exe?dl=1"), $@"{selectedGameDir}\Backup_before_restore\rgsc1178setup.exe");
+                            webClient.Dispose();
                         }
 
                         //If there already exists a Backup_before_restore folder, create a new one with a timestamp added at the end of the name and backup there to avoid conflicts
@@ -525,6 +567,13 @@ namespace GTAV_Downgrader
                             File.Copy($@"{selectedGameDir}\GTAVLauncher.exe", $@"{selectedGameDir}\Backup_before_restore_{unixTimestamp}\GTAVLauncher.exe");
                             File.Copy($@"{selectedGameDir}\steam_api64.dll", $@"{selectedGameDir}\Backup_before_restore_{unixTimestamp}\steam_api64.dll");
                             File.Copy($@"{selectedGameDir}\update\update.rpf", $@"{selectedGameDir}\Backup_before_restore_{unixTimestamp}\update\update.rpf");
+
+                            //Downloading RGSC 1.1.7.8 file from internet so this backup can be reinstalled through "Install patch from local files"
+                            this.Refresh();
+                            toolStripStatusLabel1.Text = "Backing up RGSC 1.1.7.8...";
+                            WebClient webClient = new WebClient();
+                            webClient.DownloadFile(new Uri("https://www.dropbox.com/s/9oq2qw2d3zsd86x/Social-Club-v1.1.7.8-Setup.exe?dl=1"), $@"{selectedGameDir}\Backup_before_restore_{unixTimestamp}\rgsc1178setup.exe");
+                            webClient.Dispose();
                         }
                     }
 
@@ -578,6 +627,7 @@ namespace GTAV_Downgrader
                     //Done
                     toolStripStatusLabel1.Text = "Ready.";
                     this.Refresh();
+                    GetWindowOnTop();
                     Cursor.Current = Cursors.Default;
                     MessageBox.Show("Restore complete!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     
@@ -596,31 +646,39 @@ namespace GTAV_Downgrader
                 string patchDir = folderBrowserLocalPatchDir.SelectedPath;
 
                 //Checking for every file to backup in the selected folder
+                toolStripStatusLabel1.Text = "Checking for required files...";
+                this.Refresh();
                 if (!File.Exists($@"{patchDir}\GTA5.exe"))
                 {
                     MessageBox.Show("GTA5.exe not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripStatusLabel1.Text = "Ready.";
                 }
 
                 else if (!File.Exists($@"{patchDir}\GTAVLauncher.exe"))
                 {
                     MessageBox.Show("GTAVLauncher.exe not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripStatusLabel1.Text = "Ready.";
                 }
 
                 else if (!File.Exists($@"{patchDir}\steam_api64.dll"))
                 {
                     MessageBox.Show("steam_api64.dll not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripStatusLabel1.Text = "Ready.";
                 }
 
                 else if (!File.Exists($@"{patchDir}\update\update.rpf") && !File.Exists($@"{patchDir}\update.rpf"))
                 {
-                    MessageBox.Show("update.rpf not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+                    MessageBox.Show("update.rpf not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripStatusLabel1.Text = "Ready.";
                 }
-                else if (!File.Exists($@"{patchDir}\Social-Club-v1.1.7.8-Setup.exe") && (listView1.Items[4].SubItems[2].Text != "1.1.6.8" && listView1.Items[4].SubItems[2].Text != "1.1.7.8"))
+                else if (!RGSC1178SetupExists(patchDir) && (listView1.Items[4].SubItems[2].Text != "1.1.6.8" && listView1.Items[4].SubItems[2].Text != "1.1.7.8"))
                 {
-                    MessageBox.Show("Social-Club-v1.1.7.8-Setup.exe not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Social Club 1.1.7.8 setup file not found in selected directory. Patching aborted.", "File not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripStatusLabel1.Text = "Ready.";
                 }
                 else //none of the files are missing
                 {
+                    toolStripStatusLabel1.Text = "Ready.";
                     DialogResult dialogResult = MessageBox.Show("The downgrader will now install patch 1.27. If needed, you will be prompted to uninstall and install RGSC. Please do not close the downgrader until the completion popup appears. Your current game files will be backed up in \"Backup_before_downgrade\" in your game directory.", "Patch", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                     if (dialogResult == DialogResult.Cancel)
                     {
@@ -676,12 +734,12 @@ namespace GTAV_Downgrader
                             //Looping nothing while RGSC uninstallation process is running (uninstaller's process name is "Au_")
                         }
 
-                        var process6 = new Process { StartInfo = new ProcessStartInfo($@"{patchDir}\Social-Club-v1.1.7.8-Setup.exe") };
+                        var process6 = new Process { StartInfo = new ProcessStartInfo(rgsc1178SetupDir) };
                         process6.Start();
                         process6.WaitForExit();
-                        while (ProcessIsRunning("Social-Club-v1.1.7.8-Setup.exe"))
+                        while (ProcessIsRunning(rgsc1178SetupDir))
                         {
-                            //Looping nothing while RGSC setup process is running
+                            //Looping nothing while RGSC setup 1.1.7.8 process is running
                         }
                     }
 
@@ -699,6 +757,7 @@ namespace GTAV_Downgrader
                     //Done
                     toolStripStatusLabel1.Text = "Ready.";
                     this.Refresh();
+                    GetWindowOnTop();
                     MessageBox.Show("Downgrade complete!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Cursor.Current = Cursors.Default;
                 }

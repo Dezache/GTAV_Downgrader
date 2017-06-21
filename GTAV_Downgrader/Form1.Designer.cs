@@ -242,7 +242,7 @@
             // folderBrowserLocalPatchDir
             // 
             this.folderBrowserLocalPatchDir.Description = "Select your patch folder (containing GTA5.exe, GTAVLauncher.exe, update.rpf, stea" +
-    "m_api64.dll, Social-Club-v1.1.7.8-Setup.exe)";
+    "m_api64.dll and RGSC 1.1.7.8 setup file)";
             this.folderBrowserLocalPatchDir.RootFolder = System.Environment.SpecialFolder.MyComputer;
             this.folderBrowserLocalPatchDir.ShowNewFolderButton = false;
             // 
@@ -270,7 +270,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(18, 12);
             this.label2.TabIndex = 14;
-            this.label2.Text = "1.1";
+            this.label2.Text = "1.2";
             // 
             // Form1
             // 
